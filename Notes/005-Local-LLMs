@@ -1,0 +1,284 @@
+## 🧠 Local LLMs (Large Language Models)
+
+### 📌 What Are Local LLMs?
+
+Local LLMs are language models that run on your **own hardware**, without needing access to cloud APIs. You can run them on:
+
+* Laptops/Desktops (with CPU or GPU)
+* Edge devices (like Raspberry Pi)
+* Local servers or clusters
+
+---
+
+### 🔄 Why Use Local LLMs?
+
+| Benefit              | Description                              |
+| -------------------- | ---------------------------------------- |
+| ✅ **Privacy**        | No data leaves your device or network    |
+| ✅ **Cost Control**   | No API billing; one-time compute cost    |
+| ✅ **Offline Access** | Works without internet                   |
+| ✅ **Customization**  | Easily modify or fine-tune models        |
+| ✅ **Latency**        | Fast response time (no network overhead) |
+
+---
+
+## 🧩 Key Concepts
+
+### 📦 Model Format
+
+* **GGUF** (Grokking GGML Unified Format): New standard for local LLMs (used by llama.cpp, KoboldCpp, etc.)
+* **Safetensors**: Used for secure and fast inference, especially with HuggingFace libraries
+* **PyTorch/Transformers Checkpoints**: Full precision model weights (.bin/.pth) for GPUs
+
+---
+
+### 🧮 Quantization
+
+#### ❓ What is Quantization?
+
+Reducing the **bit-width** (precision) of model weights to shrink size and speed up inference.
+
+#### 🧰 Types of Quantization:
+
+| Type                      | Precision | Size       | Speed     | Quality Loss |
+| ------------------------- | --------- | ---------- | --------- | ------------ |
+| **FP32**                  | 32-bit    | Huge       | Slow      | None         |
+| **FP16**                  | 16-bit    | Medium     | Faster    | Low          |
+| **INT8**                  | 8-bit     | Small      | Fast      | Some         |
+| **Q4\_0 / Q5\_K / Q8\_0** | Custom    | Very Small | Very Fast | Varies       |
+
+📝 **Trade-off**: Lower quantization = smaller, faster models but slightly lower accuracy.
+
+#### ✅ Why Use It?
+
+* Run on CPU-only devices
+* Fit large models in small VRAM (e.g., 7B model on 4GB RAM)
+
+---
+
+### 🛠️ Popular Inference Engines
+
+| Tool                       | Description                                        |
+| -------------------------- | -------------------------------------------------- |
+| **llama.cpp**              | Fast CPU/GPU backend for LLaMA & GGUF models       |
+| **Ollama**                 | Easiest way to run models locally (uses llama.cpp) |
+| **LM Studio**              | GUI wrapper for local models, chat interface       |
+| **KoboldCpp**              | Chat + storytelling optimized interface            |
+| **Text Generation Web UI** | Full-featured web UI for running models            |
+
+---
+
+### 🔍 Examples of Local LLMs
+
+| Model                     | Size   | Highlights                            |
+| ------------------------- | ------ | ------------------------------------- |
+| **LLaMA 3 8B/70B**        | 4–70GB | Meta's open models (state-of-the-art) |
+| **Mistral 7B**            | 4–10GB | Dense & fast, open weights            |
+| **Gemma 2B/7B**           | 2–7GB  | Google's open models                  |
+| **Phi-2 / Phi-3**         | 1.3–7B | Small, high-quality for on-device use |
+| **TinyLLM / GGML Alpaca** | 1–3GB  | Tiny inference models                 |
+
+---
+
+## 🧪 Running a Local LLM (Example with Ollama)
+
+1. Install Ollama:
+
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+2. Pull a model:
+
+```bash
+ollama run llama3
+```
+
+3. Chat in terminal:
+
+```
+> How does backpropagation work?
+```
+
+---
+
+### 🧠 Fine-Tuning / Customization
+
+* **LoRA** (Low-Rank Adaptation): Lightweight tuning method that adds adapter layers
+* **QLoRA**: LoRA applied to quantized models (GPU efficient)
+* Fine-tuning typically uses `transformers` + `peft` + `bitsandbytes`
+
+---
+
+### 📉 Limitations
+
+| Limitation         | Description                                    |
+| ------------------ | ---------------------------------------------- |
+| 💾 Storage         | Models require large disk space (4–30GB)       |
+| 🧠 RAM/VRAM        | Inference needs 4GB+ RAM or GPU                |
+| 🐢 Slower Training | Full fine-tuning is resource intensive locally |
+| ⚖️ Accuracy Gap    | Smaller models < GPT-4 in reasoning ability    |
+
+---
+
+### ✅ Summary Table
+
+| Feature       | Cloud LLMs          | Local LLMs                   |
+| ------------- | ------------------- | ---------------------------- |
+| Cost          | Pay per use         | Free after setup             |
+| Data Privacy  | Limited             | Full control                 |
+| Customization | Limited / expensive | Easy & local                 |
+| Setup         | Minimal (API)       | Some effort (models + tools) |
+| Offline Use   | ❌                   | ✅                            |
+
+---
+
+
+## 💾 Memory Requirements for Running Local LLMs
+
+### 📌 Key Memory Types to Consider
+
+| Memory Type             | Used For                                            |
+| ----------------------- | --------------------------------------------------- |
+| **VRAM (GPU RAM)**      | Storing and running model weights on the GPU        |
+| **RAM (System Memory)** | Holding model weights and buffers on CPU            |
+| **Disk (Storage)**      | Storing model files (GGUF, .bin, safetensors, etc.) |
+
+---
+
+### 📊 Approximate VRAM / RAM Requirements (for CPU or GPU inference)
+
+| Model Size | Full Precision (FP16/32) | Quantized (Q4, Q5) | Notes                                        |
+| ---------- | ------------------------ | ------------------ | -------------------------------------------- |
+| **1–2B**   | 2–4 GB                   | 1–2 GB             | Suitable for mobile/edge                     |
+| **3–7B**   | 8–16 GB                  | 3–6 GB             | Usable on high-RAM laptops or mid-range GPUs |
+| **13B**    | 20–28 GB                 | 8–12 GB            | Needs strong desktop with GPU or lots of RAM |
+| **33B+**   | 40–80 GB+                | 16–32 GB+          | Requires powerful GPU or multiple GPUs       |
+
+📝 **Rule of Thumb**:
+
+* For quantized models (like Q4\_0), you usually need **\~1GB per 1B parameter**.
+* Add **extra 2–4GB** for buffers, context, and runtime overhead.
+
+---
+
+### 📦 Disk Space Requirements
+
+| Model Type            | Typical Size (Uncompressed) |
+| --------------------- | --------------------------- |
+| **7B (GGUF, Q4\_0)**  | \~3–5 GB                    |
+| **13B (GGUF, Q5\_K)** | \~8–10 GB                   |
+| **70B (GGUF, Q6\_K)** | \~30–40 GB                  |
+
+📁 Ensure your disk is **SSD**, not HDD, for faster loading and paging.
+
+---
+
+### ⚠️ Key Considerations
+
+* **Context Length**: Longer contexts (e.g., 8K, 16K tokens) use more memory.
+* **Streaming vs Full Generation**: Streaming uses less memory at once.
+* **Batch Size**: Running multiple prompts in parallel increases usage.
+* **Tool Overhead**: UI-based tools (LM Studio, TextGen WebUI) add to baseline memory use.
+
+---
+
+### 🧠 Optimization Tips
+
+* Use **quantized models** (e.g., Q4\_K\_M, Q5\_K\_M) for smaller VRAM/RAM needs.
+* On **CPU-only machines**, use `llama.cpp` with lower quantization (Q4 or Q3).
+* For **low-end GPUs**, pick models under 7B and use `--low-vram` modes where supported.
+* Use **Ollama** for automatic memory-adaptive quantized model loading.
+
+---
+## 👥 Multithreading & Concurrency in Local LLMs (Multi-User Context)
+
+### 🔁 1. Single-threaded Inference per Request (Common)
+
+Most local LLM backends (like `llama.cpp` or `Ollama`) handle **one generation at a time**, even if the backend itself is multithreaded.
+
+* Each inference request (i.e., a single user prompt) uses **multiple CPU threads**.
+* If a second user sends a request while one is already generating, it may:
+
+  * Get queued (if there's a request queue)
+  * Get rejected (depending on server logic)
+  * Slow down both requests (if you run multiple instances manually)
+
+➡️ **Local LLMs are not inherently concurrent** like a web server—they usually don't do true parallel inference.
+
+---
+
+### 🧱 2. Running Concurrent Inference: Scaling Challenges
+
+#### ✅ Approaches:
+
+* **Parallel processes**: Run multiple model instances (e.g., with separate ports) and load-balance.
+* **Request queue + worker pool**: Serialize access with threads per user, reusing model context.
+* **Web UI / server-layer isolation**: Use a server (e.g., FastAPI, Express.js, or LM Studio’s backend) to queue and dispatch user prompts.
+
+#### ⚠️ Bottlenecks:
+
+| Resource          | Limiting Factor                                                  |
+| ----------------- | ---------------------------------------------------------------- |
+| **CPU threads**   | Each inference may consume 4–8+ threads                          |
+| **RAM**           | Each model copy needs several GB (e.g., 7B model = \~6GB for Q4) |
+| **VRAM** (if GPU) | Not shared well between processes (unless using batching)        |
+
+---
+
+### 🧠 What Actually Happens on Multithreaded Multi-User Load?
+
+* Multiple users = **increased contention** for threads and memory.
+* If using 8 threads for one user, and another user requests a response:
+
+  * Either request must wait, or you reduce thread usage per session.
+* Running **multiple models in parallel** (e.g., 2 x 7B models) requires double the RAM and CPU.
+
+---
+
+### 📌 Strategies for Supporting Multiple Users
+
+| Method                 | Description                                                                    |
+| ---------------------- | ------------------------------------------------------------------------------ |
+| **Thread Pool Tuning** | Limit per-inference thread count (e.g., 4 instead of 8) to allow more sessions |
+| **Load Balancing**     | Spin up multiple backend processes and route traffic to them                   |
+| **Session Queueing**   | Accept requests and queue them per user session (like a chatbot queue)         |
+| **Lightweight Models** | Use smaller, quantized models to reduce memory & thread usage                  |
+| **Model Caching**      | Reuse attention cache to speed up responses for ongoing sessions               |
+
+---
+
+### 🧪 Example (with Ollama HTTP API)
+
+Ollama does **not support concurrent generations** by default:
+
+```bash
+curl http://localhost:11434/api/generate -d '{"model": "llama3", "prompt": "Hi"}'
+# While this is running, a second request will wait or error
+```
+
+You can:
+
+* Use a FastAPI server to queue prompts
+* Launch multiple Ollama instances on different ports (with different models or duplicated models)
+* Limit thread usage via `.ollama/config`:
+
+```toml
+[defaults]
+num-parallel = 1
+num-threads = 4
+```
+
+---
+
+### 🧠 Summary
+
+| Topic          | Key Insight                                                   |
+| -------------- | ------------------------------------------------------------- |
+| Multithreading | Accelerates one user’s request using many CPU threads         |
+| Concurrency    | Requires manual queueing or multiple instances for multi-user |
+| Scaling Limits | Memory and thread contention quickly bottleneck performance   |
+| Recommendation | Queue requests or spin up multiple lightweight instances      |
+
+---
+
