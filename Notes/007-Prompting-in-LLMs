@@ -1,0 +1,291 @@
+# 🧠 Prompt Engineering Notes
+
+## 📌 What is Prompt Engineering?
+
+**Prompt engineering** is the practice of crafting effective inputs (prompts) to guide large language models (LLMs) like GPT, LLaMA, or Mistral to produce desired outputs. Since LLMs are general-purpose, their behavior is heavily influenced by how you frame your request.
+
+---
+
+## 🧩 Why is it Important?
+
+* LLMs are **sensitive to phrasing, structure, and context**.
+* Good prompts:
+
+  * Improve accuracy
+  * Reduce hallucinations
+  * Control tone/style
+  * Save compute (better outputs = fewer retries)
+* Essential for **instruction tuning**, **zero/few-shot learning**, and **RAG-based systems**.
+
+---
+
+## 🛠️ Types of Prompting
+
+### 1. **Zero-shot prompting**
+
+No examples provided; direct instruction.
+
+```text
+Translate the following English sentence to French: "I am hungry."
+```
+
+### 2. **Few-shot prompting**
+
+Include examples to show the model the task.
+
+```text
+Q: What's the capital of France?
+A: Paris
+
+Q: What's the capital of Germany?
+A: Berlin
+
+Q: What's the capital of Spain?
+A:
+```
+
+### 3. **Chain-of-Thought (CoT) prompting**
+
+Encourages step-by-step reasoning.
+
+```text
+Question: If John has 3 apples and buys 2 more, how many does he have?
+Answer: Let's think step by step...
+```
+
+### 4. **Role-based prompting**
+
+Assigns a persona or role to influence tone/behavior.
+
+```text
+You are a helpful Linux shell assistant. Respond with only commands.
+User: List all files including hidden ones.
+```
+
+### 5. **Instruction Prompting**
+
+Used with models trained on instructions (e.g., Tulu, Alpaca, LLaMA-Instruct).
+
+```json
+{
+  "instruction": "Summarize the paragraph below.",
+  "input": "The Roman Empire was one of the largest...",
+  "output": "A short summary of the Roman Empire's size and power."
+}
+```
+
+---
+
+## 🔍 Best Practices
+
+| Tip                  | Explanation                                                                      |
+| -------------------- | -------------------------------------------------------------------------------- |
+| ✅ Be specific        | "List 5 pros and cons of solar power" is better than "Tell me about solar power" |
+| ✅ Provide structure  | Use lists, bullet points, or templates                                           |
+| ✅ Give context       | Clarify domain or format expectations                                            |
+| ✅ Use system prompts | For models with system/user roles (e.g., ChatML)                                 |
+| ✅ Iterate            | Prompting is experimental – test and refine                                      |
+| ❌ Avoid ambiguity    | Don’t leave room for misinterpretation                                           |
+
+---
+
+## 🧪 Prompt Design Frameworks
+
+### **ReAct (Reason + Act)**
+
+Combines reasoning with action steps (used in tools/agents).
+
+```text
+Thought: I need to search for recent news.
+Action: Search["latest earthquake in Japan"]
+Observation: ...
+```
+
+### **TAP (Task, Answer, Post-process)**
+
+Split the work:
+
+1. Define the task
+2. Ask for raw answer
+3. Format or validate after
+
+---
+
+## 📦 Tools & Libraries
+
+| Tool                      | Use                                   |
+| ------------------------- | ------------------------------------- |
+| LangChain / LlamaIndex    | Prompt chaining, memory, retrieval    |
+| PromptLayer               | Logging and comparing prompt versions |
+| Guidance (by Microsoft)   | Templated prompt programming          |
+| OpenPrompt                | Prompt-based fine-tuning & templates  |
+| Hugging Face Transformers | Inference with custom prompts         |
+
+---
+
+## 📉 Common Pitfalls
+
+* ❌ Overly long or vague prompts
+* ❌ Forgetting to set token/length limits
+* ❌ Ignoring model temperature (affects randomness)
+* ❌ Assuming same prompt works across models
+* ❌ Expecting factual consistency without retrieval
+
+---
+
+## 📈 Prompt Evaluation
+
+* **Manual review** of outputs
+* Use metrics like BLEU/ROUGE for structured tasks
+* Use human feedback (RLHF-style)
+* Try A/B testing different prompt versions
+
+---
+
+## 🔄 Prompt Templates
+
+Example: **Question Answering Prompt**
+
+```text
+You are an expert assistant.
+Answer the question based on the context.
+
+Context:
+<insert context here>
+
+Question: <insert question>
+Answer:
+```
+
+Example: **ChatML Format** (for models like LLaMA 3 or Mistral)
+
+```text
+<|system|>
+You are a helpful AI assistant.
+<|user|>
+Summarize the following text.
+<|assistant|>
+```
+
+---
+
+# 💬 API Prompt Types: System, User, and Assistant
+
+## 📌 Overview
+
+When interacting with chat-based LLM APIs, the prompt is **structured as a sequence of messages**, each with a **role**. These roles help the model understand who is speaking and how to behave.
+
+---
+
+## 🧠 1. **System Prompt**
+
+### 🧭 Purpose:
+
+* Sets **initial instructions** or background context.
+* Defines the **model's behavior, tone, persona**, or constraints.
+* Only shown **once at the beginning** of the conversation.
+
+### 🧪 Examples:
+
+```json
+{ "role": "system", "content": "You are a helpful assistant that speaks like Shakespeare." }
+```
+
+```json
+{ "role": "system", "content": "You are a code assistant. Always respond with code only, no explanation." }
+```
+
+### ✅ Best Practices:
+
+* Keep it short but clear.
+* Use it to define rules, tone, formatting, or knowledge domain.
+* Helps reduce prompt size duplication across turns.
+
+---
+
+## 👤 2. **User Prompt**
+
+### 🙋 Purpose:
+
+* Represents what the **user is saying or asking**.
+* Can appear multiple times in a conversation.
+* The main way to **input tasks or queries**.
+
+### 🧪 Examples:
+
+```json
+{ "role": "user", "content": "How do I create a virtual environment in Python?" }
+```
+
+```json
+{ "role": "user", "content": "Summarize this article for me..." }
+```
+
+### ✅ Tips:
+
+* Be specific and structured (e.g., ask for list, bullet points, examples).
+* Can contain multiple parts (e.g., context + question).
+
+---
+
+## 🤖 3. **Assistant Prompt**
+
+### 📣 Purpose:
+
+* Represents the **model’s output**.
+* Used when:
+
+  * Continuing a multi-turn conversation.
+  * Providing **few-shot examples** in chat format.
+
+### 🧪 Examples:
+
+```json
+{ "role": "assistant", "content": "To create a virtual environment in Python, use the `venv` module..." }
+```
+
+```json
+{ "role": "assistant", "content": "Sure! Here's a summary of the article..." }
+```
+
+---
+
+## 🧱 Full Example: Chat Sequence
+
+```json
+[
+  { "role": "system", "content": "You are a friendly travel assistant." },
+  { "role": "user", "content": "I want to plan a 5-day trip to Japan." },
+  { "role": "assistant", "content": "Great! Which cities are you interested in visiting?" },
+  { "role": "user", "content": "Tokyo and Kyoto." }
+]
+```
+
+---
+
+## 🔍 Special Notes
+
+* The **order of roles matters**: system comes first, followed by user/assistant turns.
+* Helps models **retain context** across multi-turn conversations.
+* Some models (like LLaMA 2, 3, Mistral) may require **ChatML** syntax (e.g., `<|system|>`, `<|user|>`, etc.).
+* These roles also power **Instruction-following behavior** in fine-tuned models (like `gpt-3.5-turbo-instruct` or `Mistral-Instruct`).
+
+---
+
+## 📦 Usage with Open-Source Models (ChatML-like syntax)
+
+For models like LLaMA 3 or Mistral-Instruct, prompt templates often look like:
+
+```
+<|system|>
+You are a helpful assistant.
+<|user|>
+What's the capital of France?
+<|assistant|>
+```
+
+This structure mimics the API message roles and must be **manually constructed** when doing local inference.
+
+---
+
+
